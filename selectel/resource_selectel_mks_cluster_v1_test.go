@@ -225,7 +225,6 @@ resource "selectel_vpc_project_v2" "project_tf_acc_test_1" {
   name        = "%s"
   auto_quotas = true
 }
-
 resource "selectel_mks_cluster_v1" "cluster_tf_acc_test_1" {
   name                     = "%s"
   kube_version             = "%s"
@@ -241,7 +240,6 @@ resource "selectel_vpc_project_v2" "project_tf_acc_test_1" {
   name        = "%s"
   auto_quotas = true
 }
-
 resource "selectel_mks_cluster_v1" "cluster_tf_acc_test_1" {
   name         = "%s"
   kube_version = "%s"
@@ -251,6 +249,12 @@ resource "selectel_mks_cluster_v1" "cluster_tf_acc_test_1" {
   enable_autorepair                 = false
   enable_patch_version_auto_upgrade = false
   enable_pod_security_policy        = false
+  feature_gates						= [
+		"TTLAfterFinished",
+	]
+  admission_controllers				= [
+		"NamespaceLifecycle",
+	]
 }`, projectName, clusterName, kubeVersion, maintenanceWindowStart)
 }
 
@@ -260,7 +264,6 @@ func testAccMKSClusterV1Zonal(projectName, clusterName, kubeVersion, maintenance
    name        = "%s"
    auto_quotas = true
  }
-
  resource "selectel_mks_cluster_v1" "cluster_tf_acc_test_1" {
    name                              = "%s"
    kube_version                      = "%s"

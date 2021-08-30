@@ -8,10 +8,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/selectel/go-selvpcclient/selvpcclient/resell/v2/tokens"
 	v1 "github.com/selectel/mks-go/pkg/v1"
 	"github.com/selectel/mks-go/pkg/v1/cluster"
+	"github.com/selectel/mks-go/pkg/v1/kubeoptions"
 	"github.com/selectel/mks-go/pkg/v1/kubeversion"
 	"github.com/selectel/mks-go/pkg/v1/node"
 	"github.com/selectel/mks-go/pkg/v1/nodegroup"
@@ -451,6 +454,50 @@ func flattenMKSNodegroupV1Taints(views []nodegroup.Taint) []interface{} {
 	return taints
 }
 
+func flattenFeatureGates(views []*kubeoptions.View) []interface{} {
+	availableFeatureGates := make([]interface{}, len(views))
+	for i, fg := range views {
+		availableFeatureGates[i] = map[string]interface{}{
+			"kube_version_minor": fg.KubeVersion,
+			"names":              strings.Join(fg.Names, ","),
+		}
+	}
+
+	return availableFeatureGates
+}
+
+func flattenFeatureGatesFromSlice(kubeVersion string, featureGates []string) []interface{} {
+	availableFeatureGates := make([]interface{}, 1)
+	availableFeatureGates[0] = map[string]interface{}{
+		"kube_version_minor": kubeVersion,
+		"names":              strings.Join(featureGates, ","),
+	}
+
+	return availableFeatureGates
+}
+
+func flattenAdmissionControllers(views []*kubeoptions.View) []interface{} {
+	availableAdmissionControllers := make([]interface{}, len(views))
+	for i, fg := range views {
+		availableAdmissionControllers[i] = map[string]interface{}{
+			"kube_version_minor": fg.KubeVersion,
+			"names":              strings.Join(fg.Names, ","),
+		}
+	}
+
+	return availableAdmissionControllers
+}
+
+func flattenAdmissionControllersFromSlice(kubeVersion string, admissionControllers []string) []interface{} {
+	availableAdmissionControllers := make([]interface{}, 1)
+	availableAdmissionControllers[0] = map[string]interface{}{
+		"kube_version_minor": kubeVersion,
+		"names":              strings.Join(admissionControllers, ","),
+	}
+
+	return availableAdmissionControllers
+}
+
 func expandMKSNodegroupV1Taints(taints []interface{}) []nodegroup.Taint {
 	result := make([]nodegroup.Taint, len(taints))
 	for i := range taints {
@@ -482,4 +529,23 @@ func expandMKSNodegroupV1Labels(labels map[string]interface{}) map[string]string
 	}
 
 	return result
+}
+
+func getMKSClient(ctx context.Context, d *schema.ResourceData, meta interface{}) (*v1.ServiceClient, diag.Diagnostics) {
+	config := meta.(*Config)
+	resellV2Client := config.resellV2Client()
+	tokenOpts := tokens.TokenOpts{
+		ProjectID: d.Get("project_id").(string),
+	}
+
+	token, _, err := tokens.Create(ctx, resellV2Client, tokenOpts)
+	if err != nil {
+		return nil, diag.FromErr(errCreatingObject(objectToken, err))
+	}
+
+	region := d.Get("region").(string)
+	endpoint := getMKSClusterV1Endpoint(region)
+	mksClient := v1.NewMKSClientV1(token.ID, endpoint)
+
+	return mksClient, nil
 }

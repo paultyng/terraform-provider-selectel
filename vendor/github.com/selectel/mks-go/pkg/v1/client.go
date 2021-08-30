@@ -12,16 +12,18 @@ import (
 )
 
 const (
-	ResourceURLCluster             = "clusters"
-	ResourceURLKubeversion         = "kubeversions"
-	ResourceURLKubeconfig          = "kubeconfig"
-	ResourceURLRotateCerts         = "rotate-certs"
-	ResourceURLUpgradePatchVersion = "upgrade-patch-version"
-	ResourceURLUpgradeMinorVersion = "upgrade-minor-version"
-	ResourceURLTask                = "tasks"
-	ResourceURLNodegroup           = "nodegroups"
-	ResourceURLResize              = "resize"
-	ResourceURLReinstall           = "reinstall"
+	ResourceURLCluster              = "clusters"
+	ResourceURLKubeversion          = "kubeversions"
+	ResourceURLKubeconfig           = "kubeconfig"
+	ResourceURLRotateCerts          = "rotate-certs"
+	ResourceURLUpgradePatchVersion  = "upgrade-patch-version"
+	ResourceURLUpgradeMinorVersion  = "upgrade-minor-version"
+	ResourceURLTask                 = "tasks"
+	ResourceURLNodegroup            = "nodegroups"
+	ResourceURLResize               = "resize"
+	ResourceURLReinstall            = "reinstall"
+	ResourceURLFeatureGates         = "feature-gates"
+	ResourceURLAdmissionControllers = "admission-controllers"
 )
 
 const (
@@ -79,6 +81,20 @@ type ServiceClient struct {
 func NewMKSClientV1(tokenID, endpoint string) *ServiceClient {
 	return &ServiceClient{
 		HTTPClient: newHTTPClient(),
+		TokenID:    tokenID,
+		Endpoint:   endpoint,
+		UserAgent:  userAgent,
+	}
+}
+
+// NewMKSClientV1WithCustomHTTP initializes a new MKS client for the V1 API using custom HTTP client.
+// If custom HTTP client is nil - default HTTP client will be used.
+func NewMKSClientV1WithCustomHTTP(customHTTPClient *http.Client, tokenID, endpoint string) *ServiceClient {
+	if customHTTPClient == nil {
+		customHTTPClient = newHTTPClient()
+	}
+	return &ServiceClient{
+		HTTPClient: customHTTPClient,
 		TokenID:    tokenID,
 		Endpoint:   endpoint,
 		UserAgent:  userAgent,

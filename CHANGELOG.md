@@ -1,7 +1,10 @@
 ## 3.7.0 (Unreleased)
 
 FEATURES:
+* Added `feature_gates` and `admission_controllers` to cluster kubernetes options ([#166](https://github.com/selectel/terraform-provider-selectel/issues/166))
 * __New Data Source:__ `selectel_dbaas_configuration_parameter_v1` ([#162](https://github.com/selectel/terraform-provider-selectel/issues/162))
+* __New Data Source:__ `selectel_mks_available_feature_gates_v1`
+* __New Data Source:__ `selectel_mks_available_admission_controllers_v1`
 
 IMPROVEMENTS:
 * Fixed docs for DBaaS data sources ([#160](https://github.com/selectel/terraform-provider-selectel/pull/160))
