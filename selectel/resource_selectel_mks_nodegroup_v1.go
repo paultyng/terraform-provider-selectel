@@ -152,6 +152,21 @@ func resourceMKSNodegroupV1() *schema.Resource {
 					},
 				},
 			},
+			"enable_autoscale": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"autoscale_min_nodes": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  1,
+			},
+			"autoscale_max_nodes": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  1,
+			},
 		},
 	}
 }
@@ -191,18 +206,25 @@ func resourceMKSNodegroupV1Create(ctx context.Context, d *schema.ResourceData, m
 		}
 	}
 
+	enableAutoscale := d.Get("enable_autoscale").(bool)
+	autoscaleMinNodes := d.Get("autoscale_min_nodes").(int)
+	autoscaleMaxNodes := d.Get("autoscale_max_nodes").(int)
+
 	// Prepare nodegroup create options.
 	createOpts := &nodegroup.CreateOpts{
-		Count:            d.Get("nodes_count").(int),
-		FlavorID:         d.Get("flavor_id").(string),
-		CPUs:             d.Get("cpus").(int),
-		RAMMB:            d.Get("ram_mb").(int),
-		VolumeGB:         d.Get("volume_gb").(int),
-		VolumeType:       d.Get("volume_type").(string),
-		LocalVolume:      d.Get("local_volume").(bool),
-		KeypairName:      d.Get("keypair_name").(string),
-		AffinityPolicy:   d.Get("affinity_policy").(string),
-		AvailabilityZone: d.Get("availability_zone").(string),
+		Count:             d.Get("nodes_count").(int),
+		FlavorID:          d.Get("flavor_id").(string),
+		CPUs:              d.Get("cpus").(int),
+		RAMMB:             d.Get("ram_mb").(int),
+		VolumeGB:          d.Get("volume_gb").(int),
+		VolumeType:        d.Get("volume_type").(string),
+		LocalVolume:       d.Get("local_volume").(bool),
+		KeypairName:       d.Get("keypair_name").(string),
+		AffinityPolicy:    d.Get("affinity_policy").(string),
+		AvailabilityZone:  d.Get("availability_zone").(string),
+		EnableAutoscale:   &enableAutoscale,
+		AutoscaleMinNodes: &autoscaleMinNodes,
+		AutoscaleMaxNodes: &autoscaleMaxNodes,
 	}
 
 	labels := d.Get("labels").(map[string]interface{})
@@ -293,6 +315,9 @@ func resourceMKSNodegroupV1Read(ctx context.Context, d *schema.ResourceData, met
 	d.Set("local_volume", mksNodegroup.LocalVolume)
 	d.Set("availability_zone", mksNodegroup.AvailabilityZone)
 	d.Set("nodes_count", len(mksNodegroup.Nodes))
+	d.Set("enable_autoscale", mksNodegroup.EnableAutoscale)
+	d.Set("autoscale_min_nodes", mksNodegroup.AutoscaleMinNodes)
+	d.Set("autoscale_max_nodes", mksNodegroup.AutoscaleMaxNodes)
 
 	if err := d.Set("labels", mksNodegroup.Labels); err != nil {
 		log.Print(errSettingComplexAttr("labels", err))
@@ -337,10 +362,17 @@ func resourceMKSNodegroupV1Update(ctx context.Context, d *schema.ResourceData, m
 	endpoint := getMKSClusterV1Endpoint(region)
 	mksClient := v1.NewMKSClientV1(token.ID, endpoint)
 
-	if d.HasChange("labels") {
+	if d.HasChange("labels") || d.HasChange("enable_autoscale") || d.HasChange("autoscale_min_nodes") || d.HasChange("autoscale_max_nodes") {
 		labels := d.Get("labels").(map[string]interface{})
+		enableAutoscale := d.Get("enable_autoscale").(bool)
+		autoscaleMinNodes := d.Get("autoscale_min_nodes").(int)
+		autoscaleMaxNodes := d.Get("autoscale_max_nodes").(int)
+
 		updateOpts := nodegroup.UpdateOpts{
-			Labels: expandMKSNodegroupV1Labels(labels),
+			Labels:            expandMKSNodegroupV1Labels(labels),
+			EnableAutoscale:   &enableAutoscale,
+			AutoscaleMinNodes: &autoscaleMinNodes,
+			AutoscaleMaxNodes: &autoscaleMaxNodes,
 		}
 
 		log.Print(msgUpdate(objectNodegroup, d.Id(), updateOpts))
