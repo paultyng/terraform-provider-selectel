@@ -65,3 +65,4 @@ issues:
     linters:
     - goerr113
     - forcetypeassert
+    - gosec

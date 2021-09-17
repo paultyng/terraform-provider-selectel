@@ -294,6 +294,8 @@ github.com/selectel/dbaas-go v0.1.1 h1:dop1ANq6NwZTJ9MOOVL9iRBl5JWCqeldngYs4WK9C
 github.com/selectel/dbaas-go v0.1.1/go.mod h1:H2NC+UrVQzKea92LYyHZj51uuX43sUiAc+iyx/yTCGw=
 github.com/selectel/dbaas-go v0.2.0 h1:LuQYA1M+ftcNRdcCD8p+CQQ4ejU364CHuB8S23jH6GU=
 github.com/selectel/dbaas-go v0.2.0/go.mod h1:H2NC+UrVQzKea92LYyHZj51uuX43sUiAc+iyx/yTCGw=
+github.com/selectel/dbaas-go v0.3.0 h1:zSZ4/+rDiAfZAVm70jvf84/u+DzTsnugMFTgTcaDSXU=
+github.com/selectel/dbaas-go v0.3.0/go.mod h1:H2NC+UrVQzKea92LYyHZj51uuX43sUiAc+iyx/yTCGw=
 github.com/selectel/domains-go v0.3.0 h1:0shjqQmpkWc6eM1SwgKqbTTNiT5G2BOEnvS7JvuF96g=
 github.com/selectel/domains-go v0.3.0/go.mod h1:AhXhwyMSTkpEWFiBLUvzFP76W+WN+ZblwmjLJLt7y58=
 github.com/selectel/go-selvpcclient v1.12.0 h1:LsT074HOVF1dWYapsAWjaaJDQhmDPpcsVjSwQ1r1fj0=

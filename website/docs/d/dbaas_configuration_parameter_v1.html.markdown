@@ -1,7 +1,7 @@
 ---
 layout: "selectel"
 page_title: "Selectel: selectel_dbaas_configuration_parameter_v1"
-sidebar_current: "docs-selectel-datasource-dbaas-configuration_parameter-v1"
+sidebar_current: "docs-selectel-datasource-dbaas-configuration-parameter-v1"
 description: |-
   Get information on Selectel DBaaS configuration parameters.
 ---
@@ -57,7 +57,7 @@ The following attributes are exported:
 
 * `configuration_parameters` - Contains a list of the found configuration parameters.
 
-**datastore_types**
+**configuration_parameters**
 
 - `id` - ID of the configuration parameter.
 - `datastore_type_id` - Datastore type id for which the configuration parameter is availabe.

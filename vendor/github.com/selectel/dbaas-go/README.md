@@ -1,7 +1,6 @@
 # dbaas-go: Go SDK for Selectel DBaaS
 [![Go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/github.com/selectel/dbaas-go/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/selectel/dbaas-go)](https://goreportcard.com/report/github.com/selectel/dbaas-go)
-[![Build Status](https://travis-ci.com/selectel/dbaas-go.svg?branch=main)](https://travis-ci.com/selectel/dbaas-go)
 
 Package dbaas-go provides Go SDK to work with Selectel DBaaS
 
@@ -21,6 +20,7 @@ You can use this library to work with the following objects of the Selectel Mana
 * flavor
 * extension
 * available extension
+* configuration parameter
 
 ## Getting started
 
@@ -93,7 +93,7 @@ func main() {
     // Auth options for openstack to get all subnets.
     devopts := gophercloud.AuthOptions{
         IdentityEndpoint: "<endpoint>",
-        TokenID:          devToken,
+        TokenID:          token,
     }
 
     provider, err := openstack.AuthenticatedClient(devopts)
@@ -130,7 +130,7 @@ func main() {
     }
 
     // Create a new datastore.
-    newDatastore, err := dbaasClient.CreateDatastore(ctx, createOpts)
+    newDatastore, err := dbaasClient.CreateDatastore(ctx, datastoreCreateOpts)
     if err != nil {
         log.Fatal(err)
     }
