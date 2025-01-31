@@ -77,7 +77,6 @@ func resourceMKSClusterV1() *schema.Resource {
 			"enable_patch_version_auto_upgrade": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  true,
 				ForceNew: false,
 			},
 			"enable_pod_security_policy": {
@@ -222,11 +221,15 @@ func resourceMKSClusterV1Create(ctx context.Context, d *schema.ResourceData, met
 
 	// Prepare cluster create options.
 	enableAutorepair := d.Get("enable_autorepair").(bool)
-	enablePatchVersionAutoUpgrade := d.Get("enable_patch_version_auto_upgrade").(bool)
 	enablePodSecurityPolicy := d.Get("enable_pod_security_policy").(bool)
 	zonal := d.Get("zonal").(bool)
 	privateKubeAPI := d.Get("private_kube_api").(bool)
 	enableAuditLogs := d.Get("enable_audit_logs").(bool)
+
+	enablePatchVersionAutoUpgrade := !zonal // true by default only for regional clusters
+	if v, ok := d.GetOk("enable_patch_version_auto_upgrade"); ok {
+		enablePatchVersionAutoUpgrade = v.(bool)
+	}
 
 	// Check if "enable_patch_version_auto_upgrade" and "zonal" arguments are both not set to true.
 	if enablePatchVersionAutoUpgrade && zonal {
