@@ -3,15 +3,15 @@ package selectel
 import (
 	"context"
 	"crypto/md5"
+	"crypto/rand"
 	"errors"
 	"fmt"
 	"log"
 	"math"
-	"math/rand" // nosemgrep: go.lang.security.audit.crypto.math_random.math-random-used
+	"math/big"
 	"sort"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -97,7 +97,8 @@ func convertFieldToStringByType(field interface{}) string {
 }
 
 func RandomWithPrefix(name string) string {
-	return fmt.Sprintf("%s_%d", name, rand.New(rand.NewSource(time.Now().UnixNano())).Int())
+	n, _ := rand.Int(rand.Reader, big.NewInt(1000000))
+	return fmt.Sprintf("%s_%d", name, n.Int64())
 }
 
 func flavorSchema() *schema.Resource {
@@ -320,31 +321,41 @@ func updateDatastoreBackups(ctx context.Context, d *schema.ResourceData, client 
 	return nil
 }
 
-func resizeDatastore(ctx context.Context, d *schema.ResourceData, client *dbaas.API) error {
+func getResizeOpts(ctx context.Context, d *schema.ResourceData, client *dbaas.API) (dbaas.DatastoreResizeOpts, error) {
 	var resizeOpts dbaas.DatastoreResizeOpts
 	nodeCount := d.Get("node_count").(int)
 	resizeOpts.NodeCount = nodeCount
 
-	flavorID := d.Get("flavor_id")
-	flavorRaw := d.Get("flavor")
-
-	flavorSet := flavorRaw.(*schema.Set)
-	flavor, err := resourceDBaaSDatastoreV1FlavorFromSet(flavorSet)
-	if err != nil {
-		return errParseDatastoreV1Resize(err)
+	if d.HasChange("flavor_id") {
+		flavorID := d.Get("flavor_id")
+		resizeOpts.FlavorID = flavorID.(string)
+	} else if d.HasChange("flavor") {
+		flavorRaw := d.Get("flavor")
+		flavorSet := flavorRaw.(*schema.Set)
+		flavor, err := resourceDBaaSDatastoreV1FlavorFromSet(flavorSet)
+		if err != nil {
+			return resizeOpts, errParseDatastoreV1Resize(err)
+		}
+		resizeOpts.Flavor = flavor
 	}
 
 	typeID := d.Get("type_id").(string)
 	datastoreType, err := client.DatastoreType(ctx, typeID)
 	if err != nil {
-		return errors.New("Couldnt get datastore type with id" + typeID)
+		return resizeOpts, errors.New("Couldnt get datastore type with id" + typeID)
 	}
+
 	if datastoreType.Engine == "redis" {
 		resizeOpts.Flavor = nil
-		resizeOpts.FlavorID = flavorID.(string)
-	} else {
-		resizeOpts.Flavor = flavor
-		resizeOpts.FlavorID = flavorID.(string)
+	}
+
+	return resizeOpts, nil
+}
+
+func resizeDatastore(ctx context.Context, d *schema.ResourceData, client *dbaas.API) error {
+	resizeOpts, err := getResizeOpts(ctx, d, client)
+	if err != nil {
+		return errUpdatingObject(objectDatastore, d.Id(), err)
 	}
 
 	log.Print(msgUpdate(objectDatastore, d.Id(), resizeOpts))
