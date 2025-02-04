@@ -55,6 +55,54 @@ func waitForMKSClusterV1ActiveState(
 	return nil
 }
 
+func waitForMKSNodegroupV1ActiveState(
+	ctx context.Context, client *v1.ServiceClient, clusterID string, nodegroupID string, timeout time.Duration,
+) error {
+	pending := []string{
+		string(nodegroup.StatusPendingCreate),
+		string(nodegroup.StatusPendingUpdate),
+		string(nodegroup.StatusPendingDelete),
+		string(nodegroup.StatusPendingScaleUp),
+		string(nodegroup.StatusPendingScaleDown),
+		string(nodegroup.StatusPendingNodeReinstall),
+	}
+
+	target := []string{
+		string(nodegroup.StatusActive),
+	}
+
+	stateConf := &resource.StateChangeConf{
+		Pending:    pending,
+		Target:     target,
+		Refresh:    mksNodegroupV1StateRefreshFunc(ctx, client, clusterID, nodegroupID),
+		Timeout:    timeout,
+		Delay:      10 * time.Second,
+		MinTimeout: 3 * time.Second,
+	}
+
+	_, err := stateConf.WaitForStateContext(ctx)
+	if err != nil {
+		return fmt.Errorf(
+			"error waiting for the nodegroup %s to become 'ACTIVE': %s",
+			nodegroupID, err)
+	}
+
+	return nil
+}
+
+func mksNodegroupV1StateRefreshFunc(
+	ctx context.Context, client *v1.ServiceClient, clusterID, nodegroupID string,
+) resource.StateRefreshFunc {
+	return func() (interface{}, string, error) {
+		ng, _, err := nodegroup.Get(ctx, client, clusterID, nodegroupID)
+		if err != nil {
+			return nil, "", err
+		}
+
+		return ng, string(ng.Status), nil
+	}
+}
+
 func mksClusterV1StateRefreshFunc(
 	ctx context.Context, client *v1.ServiceClient, clusterID string,
 ) resource.StateRefreshFunc {

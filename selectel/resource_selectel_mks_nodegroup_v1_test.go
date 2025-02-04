@@ -62,6 +62,7 @@ func TestAccMKSNodegroupV1Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "taints.2.value", "test-value-2"),
 					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "taints.2.effect", "PreferNoSchedule"),
 					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "nodegroup_type", "STANDARD"),
+					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "status", "ACTIVE"),
 				),
 			},
 			{
@@ -93,6 +94,7 @@ func TestAccMKSNodegroupV1Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "taints.2.value", "test-value-3"),
 					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "taints.2.effect", "NoSchedule"),
 					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "nodegroup_type", "STANDARD"),
+					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "status", "ACTIVE"),
 				),
 			},
 			{
@@ -123,6 +125,7 @@ func TestAccMKSNodegroupV1Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "taints.2.value", "test-value-3"),
 					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "taints.2.effect", "NoSchedule"),
 					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "nodegroup_type", "STANDARD"),
+					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "status", "ACTIVE"),
 				),
 			},
 			{
@@ -153,6 +156,7 @@ func TestAccMKSNodegroupV1Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "taints.2.value", "test-value-3"),
 					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "taints.2.effect", "NoSchedule"),
 					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "nodegroup_type", "STANDARD"),
+					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "status", "ACTIVE"),
 				),
 			},
 			{
@@ -187,6 +191,7 @@ func TestAccMKSNodegroupV1Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "taints.2.value", "test-value-2"),
 					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "taints.2.effect", "PreferNoSchedule"),
 					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "nodegroup_type", "STANDARD"),
+					resource.TestCheckResourceAttr("selectel_mks_nodegroup_v1.nodegroup_tf_acc_test_1", "status", "ACTIVE"),
 				),
 			},
 		},
